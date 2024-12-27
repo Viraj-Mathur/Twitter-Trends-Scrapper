@@ -1,0 +1,5 @@
+Flask==2.3.2
+pymongo==4.7.0
+selenium==4.12.0
+undetected-chromedriver==3.5.1
+python-dotenv==1.0.0

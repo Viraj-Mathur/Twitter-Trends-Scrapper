@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Trends Scraper</title>
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            margin: 0;
+            padding: 0;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .container h2 {
+            color: #495057;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 20px auto;
+            background-color: #6c63ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.2s;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            background-color: #4d4db2;
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        #results {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        #results ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #results ul li {
+            background: #6c63ff;
+            color: #ffffff;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #results ul li:hover {
+            background-color: #4d4db2;
+        }
+
+        #results pre {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px 0;
+            background: #343a40;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        a {
+            color: #6c63ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Twitter Trends Scraper</h1>
+    </header>
+
+    <div class="container">
+        <h2>Discover the Latest Trending Topics</h2>
+        <button class="button" id="run-script">Fetch Trending Topics</button>
+
+        <div id="results">
+            <p>Click the button above to fetch the latest trending topics and view the results here.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 Twitter Trends Scraper. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Event listener for the button
+        document.getElementById('run-script').addEventListener('click', async function () {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = "<p>Running script, please wait...</p>";
+
+            try {
+                // Fetch data from the server
+                const response = await fetch('/run-script');
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    const record = data.data;
+                    const dateTime = new Date(record.timestamp).toLocaleString();
+
+                    let trends = `
+                        <h3>These are the most happening topics as of ${dateTime}:</h3>
+                        <ul>
+                            <li>${record.trend1 || "N/A"}</li>
+                            <li>${record.trend2 || "N/A"}</li>
+                            <li>${record.trend3 || "N/A"}</li>
+                            <li>${record.trend4 || "N/A"}</li>
+                            <li>${record.trend5 || "N/A"}</li>
+                        </ul>
+                        <p>The IP address used for this query was: <strong>${record.ip_address || "N/A"}</strong></p>
+                        <h3>JSON Extract:</h3>
+                        <pre>${JSON.stringify(record, null, 4)}</pre>
+                        <p><a href="#" id="run-again">Click here to run the query again.</a></p>
+                    `;
+
+                    resultsDiv.innerHTML = trends;
+
+                    // Add "Run Again" functionality
+                    document.getElementById('run-again').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.getElementById('run-script').click();
+                    });
+                } else {
+                    resultsDiv.innerHTML = `<p>Error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p>An error occurred: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
